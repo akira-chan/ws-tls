@@ -5,7 +5,7 @@ wget -O VMess-fAEAD-disable.sh https://raw.githubusercontent.com/KukiSa/VMess-fA
 ### 安装/更新方式（h2 和 ws 版本已合并）
 Vmess+websocket+TLS+Nginx+Website
 ```
-wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.com/akira-chan/V2Ray_ws-tls_bash_onekey/master/install.sh" && chmod +x install.sh && bash install.sh
+wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.com/akira-chan/ws-tls/main/install.sh" && chmod +x install.sh && bash install.sh
 ```
 
 
