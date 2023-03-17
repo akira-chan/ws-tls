@@ -438,7 +438,7 @@ ssl_install() {
 }
 
 domain_check() {
-    read -rp "请输入你的域名信息(eg:www.akira.com):" domain
+    read -rp "请输入你的域名信息(eg:www.wulabing.com):" domain
     domain_ip=$(curl -sm8 https://ipget.net/?ip="${domain}")
     echo -e "${OK} ${GreenBG} 正在获取 公网ip 信息，请耐心等待 ${Font}"
     wgcfv4_status=$(curl -s4m8 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
@@ -448,8 +448,8 @@ domain_check() {
         wg-quick down wgcf >/dev/null 2>&1
         echo -e "${OK} ${GreenBG} 已关闭 wgcf-warp ${Font}"
     fi
-    local_ipv4=$(curl -s4m8 https://ip.gs)
-    local_ipv6=$(curl -s6m8 https://ip.gs)
+    local_ipv4=$(curl -s4m8 http://ip.sb)
+    local_ipv6=$(curl -s6m8 http://ip.sb)
     if [[ -z ${local_ipv4} && -n ${local_ipv6} ]]; then
         echo -e nameserver 2a01:4f8:c2c:123f::1 > /etc/resolv.conf
         echo -e "${OK} ${GreenBG} 识别为 IPv6 Only 的 VPS，自动添加 DNS64 服务器 ${Font}"
@@ -568,11 +568,13 @@ nginx_conf_add() {
         index index.html index.htm;
         root  /home/wwwroot/3DCEList;
         error_page 400 = /400.html;
+
         # Config for 0-RTT in TLSv1.3
         ssl_early_data on;
         ssl_stapling on;
         ssl_stapling_verify on;
         add_header Strict-Transport-Security "max-age=31536000";
+
         location /ray/
         {
         proxy_redirect off;
@@ -584,6 +586,7 @@ nginx_conf_add() {
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$http_host;
+
         # Config for 0-RTT in TLSv1.3
         proxy_set_header Early-Data \$ssl_early_data;
         }
@@ -666,7 +669,7 @@ vmess_qr_config_tls_ws() {
     cat >$v2ray_qr_config_file <<-EOF
 {
   "v": "2",
-  "ps": "${domain}",
+  "ps": "wulabing_${domain}",
   "add": "${domain}",
   "port": "${port}",
   "id": "${UUID}",
@@ -684,7 +687,7 @@ vmess_qr_config_h2() {
     cat >$v2ray_qr_config_file <<-EOF
 {
   "v": "2",
-  "ps": "${domain}",
+  "ps": "wulabing_${domain}",
   "add": "${domain}",
   "port": "${port}",
   "id": "${UUID}",
@@ -764,7 +767,7 @@ ssl_judge_and_install() {
         read -r ssl_delete
         case $ssl_delete in
         [yY][eE][sS] | [yY])
-            rm -rf /data/*
+            rm -rf /data/v2ray.crt /data/v2ray.key
             echo -e "${OK} ${GreenBG} 已删除 ${Font}"
             ;;
         *) ;;
@@ -789,6 +792,7 @@ nginx_systemd() {
 [Unit]
 Description=The NGINX HTTP and reverse proxy server
 After=syslog.target network.target remote-fs.target nss-lookup.target
+
 [Service]
 Type=forking
 PIDFile=/etc/nginx/logs/nginx.pid
@@ -797,6 +801,7 @@ ExecStart=/etc/nginx/sbin/nginx -c ${nginx_dir}/conf/nginx.conf
 ExecReload=/etc/nginx/sbin/nginx -s reload
 ExecStop=/bin/kill -s QUIT \$MAINPID
 PrivateTmp=true
+
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -881,7 +886,7 @@ uninstall_all() {
     [yY][eE][sS] | [yY])
       /root/.acme.sh/acme.sh --uninstall
       rm -rf /root/.acme.sh
-      rm -rf /data/*
+      rm -rf /data/v2ray.crt /data/v2ray.key
       ;;
     *) ;;
     esac
@@ -1031,8 +1036,7 @@ menu() {
     echo -e "${Green}14.${Font} 卸载 V2Ray"
     echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
     echo -e "${Green}16.${Font} 清空 证书遗留文件"
-    echo -e "${Green}17.${Font} MD5兼容旧版客户端"
-    echo -e "${Green}18.${Font} 退出 \n"
+    echo -e "${Green}17.${Font} 退出 \n"
 
     read -rp "请输入数字：" menu_num
     case $menu_num in
@@ -1104,12 +1108,9 @@ menu() {
         delete_tls_key_and_crt
         ;;
     17)
-        wget -O VMess-fAEAD-disable.sh https://raw.githubusercontent.com/KukiSa/VMess-fAEAD-disable/main/main.sh && bash VMess-fAEAD-disable.sh
+        exit 0
         ;;
     18)
-        exit 0
-        ;;	
-    19)
         read -rp "请输入伪装路径(注意！不需要加斜杠 eg:ray):" camouflage_path
         modify_camouflage_path
         start_process_systemd
@@ -1122,17 +1123,3 @@ menu() {
 
 judge_mode
 list "$1"
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
