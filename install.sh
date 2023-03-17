@@ -438,7 +438,7 @@ ssl_install() {
 }
 
 domain_check() {
-    read -rp "请输入你的域名信息(eg:www.wulabing.com):" domain
+    read -rp "请输入你的域名信息(eg:www.akira.com):" domain
     domain_ip=$(curl -sm8 https://ipget.net/?ip="${domain}")
     echo -e "${OK} ${GreenBG} 正在获取 公网ip 信息，请耐心等待 ${Font}"
     wgcfv4_status=$(curl -s4m8 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
@@ -669,7 +669,7 @@ vmess_qr_config_tls_ws() {
     cat >$v2ray_qr_config_file <<-EOF
 {
   "v": "2",
-  "ps": "wulabing_${domain}",
+  "ps": "${domain}",
   "add": "${domain}",
   "port": "${port}",
   "id": "${UUID}",
@@ -687,7 +687,7 @@ vmess_qr_config_h2() {
     cat >$v2ray_qr_config_file <<-EOF
 {
   "v": "2",
-  "ps": "wulabing_${domain}",
+  "ps": "${domain}",
   "add": "${domain}",
   "port": "${port}",
   "id": "${UUID}",
@@ -1036,7 +1036,9 @@ menu() {
     echo -e "${Green}14.${Font} 卸载 V2Ray"
     echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
     echo -e "${Green}16.${Font} 清空 证书遗留文件"
-    echo -e "${Green}17.${Font} 退出 \n"
+    echo -e "${Green}17.${Font} MD5兼容旧版客户端"
+    echo -e "${Green}18.${Font} 退出 \n"
+    
 
     read -rp "请输入数字：" menu_num
     case $menu_num in
@@ -1108,9 +1110,12 @@ menu() {
         delete_tls_key_and_crt
         ;;
     17)
-        exit 0
+        wget -O VMess-fAEAD-disable.sh https://raw.githubusercontent.com/KukiSa/VMess-fAEAD-disable/main/main.sh && bash VMess-fAEAD-disable.sh
         ;;
     18)
+        exit 0
+        ;;
+    19)
         read -rp "请输入伪装路径(注意！不需要加斜杠 eg:ray):" camouflage_path
         modify_camouflage_path
         start_process_systemd
