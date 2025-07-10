@@ -1110,7 +1110,7 @@ menu() {
         delete_tls_key_and_crt
         ;;
     17)
-        wget -O VMess-fAEAD-disable.sh https://raw.githubusercontent.com/KukiSa/VMess-fAEAD-disable/main/main.sh && bash VMess-fAEAD-disable.sh
+        wget -O VMess-fAEAD-disable.sh https://raw.githubusercontent.com/akira-chan/VMess-fAEAD-disable/main/main.sh && bash VMess-fAEAD-disable.sh
         ;;
     18)
         exit 0
