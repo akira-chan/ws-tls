@@ -428,8 +428,11 @@ nginx_install() {
 ssl_install() {
     if [[ "${ID}" == "centos" ]]; then
         ${INS} install socat nc -y
+	elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 12 ]]; then
+		${INS} install socat netcat-openbsd -y
     else
-        ${INS} install socat netcat-traditional 1.10-47 -y
+        ${INS} install socat netcat -y
+        ${INS} install socat netcat-openbsd -y
     fi
     judge "安装 SSL 证书生成脚本依赖"
 
